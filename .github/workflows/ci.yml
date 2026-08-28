@@ -32,7 +32,7 @@ jobs:
                 Get-Location
                 Get-ChildItem -Recurse -Name
                 
-                msbuild src/MathLib.sln /t:Rebuild `
+                msbuild MathLib/MathLib.sln /t:Rebuild `
                 /p:Configuration=Release `
                 /p:Platform=x64 /m
                 
@@ -40,6 +40,6 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                 name:  VC-DLL
-                path: x64/Release
+                path: MathLib/x64/Release
                 
              
