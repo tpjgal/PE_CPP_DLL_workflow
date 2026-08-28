@@ -27,10 +27,11 @@ jobs:
               uses: microsoft/setup-msbuild@v2
               
             - name: Build Solution 
+              shell: pwsh
               run: |
-                msbuild MathLib.sln ^
-                /p:Configuration=Release ^
-                /p:Platform=x64
+                msbuild MathLib.sln /t:Rebuild `
+                /p:Configuration=Release `
+                /p:Platform=x64 /m
                 
             - name: Upload Artifacts 
               uses: actions/upload-artifact@v4
