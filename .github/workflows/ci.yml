@@ -2,45 +2,46 @@ name: CI
 
 on:
   push:
-    branches: [develop, 'feature/**', 'bugfix/**']
+    branches:
+      - develop
+      - 'feature/**'
+      - 'bugfix/**'
   pull_request:
-    branches: [main, master, develop]
+    branches:
+      - main
+      - master
+      - develop
   workflow_dispatch:
-  
-  
+
 env:
-    SOLUTION: src/MathLib.sln
-    BUILD_CONFIGURATION: Release 
-    BUILD_PLATFORM: x64 
-    
-    
+  SOLUTION: MathLib/MathLib.sln
+  BUILD_CONFIGURATION: Release
+  BUILD_PLATFORM: x64
+
 jobs:
-    build-test:
-        name: Build, Test & Coverage
-        runs-on: windows-latest 
-        steps:
-            - name: Checkout 
-              uses: actions/checkout@v4
-              
-              
-            - name: Setup MSBuild 
-              uses: microsoft/setup-msbuild@v2
-              
-            - name: Build Solution
-              shell: pwsh
-              run: |
-                msbuild MathLib/MathLib.sln `
-                /t:Rebuild `
-                /p:Configuration=Release `
-                /p:Platform=x64 `
-                /m `
-                /verbosity:normal
-                
-            - name: Upload Artifacts 
-              uses: actions/upload-artifact@v4
-              with:
-                name:  VC-DLL
-               path: |
-                MathLib/x64/Release/*.dll
-                
-             
+  build-test:
+    name: Build, Test & Coverage
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build Solution
+        shell: pwsh
+        run: |
+          msbuild "${{ env.SOLUTION }}" `
+            /t:Rebuild `
+            /p:Configuration=${{ env.BUILD_CONFIGURATION }} `
+            /p:Platform="${{ env.BUILD_PLATFORM }}" `
+            /m `
+            /verbosity:normal
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: VC-DLL
+          path: MathLib/x64/Release/*.dll
