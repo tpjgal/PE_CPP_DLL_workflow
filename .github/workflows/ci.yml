@@ -79,6 +79,12 @@ jobs:
 
           & $coverageExe `
             --sources MathLib `
+            --modules MathLib.dll `
+            --excluded_modules vstest.console.exe `
+            --excluded_modules clr.dll `
+            --excluded_modules mscoree.dll `
+            --excluded_modules "System.*" `
+            --excluded_modules "Microsoft.*" `
             --export_type cobertura:coverage.xml `
             --working_dir . `
             -- `
