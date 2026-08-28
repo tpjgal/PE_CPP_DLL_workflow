@@ -9,37 +9,7 @@ on:
   
   
 env:
-    SOLUTION: MathLib.sln
-    BUILD_CONFIGURATION: Release 
-    BUILD_PLATFORM: x64 
-    
-    
-jobs:
-    build-test:
-        name: Build, Test & Coverage
-        runs-on: windows-latest 
-        steps:
-            - name: Checkout 
-              uses: actions/checkout@v4
-              
-              
-            - name: Setup MSBuild 
-              uses: microsoft/setup-msbuild@v2
-              
-            - name: Build Solution 
-              shell: pwsh
-              name: CI
-
-on:
-  push:
-    branches: [develop, 'feature/**', 'bugfix/**']
-  pull_request:
-    branches: [main, master, develop]
-  workflow_dispatch:
-  
-  
-env:
-    SOLUTION: MathLib.sln
+    SOLUTION: src/MathLib.sln
     BUILD_CONFIGURATION: Release 
     BUILD_PLATFORM: x64 
     
@@ -59,15 +29,9 @@ jobs:
             - name: Build Solution 
               shell: pwsh
               run: |
-                msbuild MathLib.sln /t:Rebuild `
+                msbuild src/MathLib.sln /t:Rebuild `
                 /p:Configuration=Release `
                 /p:Platform=x64 /m
-                
-            - name: Upload Artifacts 
-              uses: actions/upload-artifact@v4
-              with:
-                name:  VC-DLL
-                path: x64/Release
                 
             - name: Upload Artifacts 
               uses: actions/upload-artifact@v4
