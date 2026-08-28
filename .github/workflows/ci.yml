@@ -26,20 +26,21 @@ jobs:
             - name: Setup MSBuild 
               uses: microsoft/setup-msbuild@v2
               
-            - name: Build Solution 
+            - name: Build Solution
               shell: pwsh
               run: |
-                Get-Location
-                Get-ChildItem -Recurse -Name
-                
-                msbuild MathLib/MathLib.sln /t:Rebuild `
+                msbuild MathLib/MathLib.sln `
+                /t:Rebuild `
                 /p:Configuration=Release `
-                /p:Platform=x64 /m
+                /p:Platform=x64 `
+                /m `
+                /verbosity:normal
                 
             - name: Upload Artifacts 
               uses: actions/upload-artifact@v4
               with:
                 name:  VC-DLL
-                path: MathLib/x64/Release
+               path: |
+                MathLib/x64/Release/*.dll
                 
              
