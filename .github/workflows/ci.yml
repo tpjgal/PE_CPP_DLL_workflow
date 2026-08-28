@@ -40,7 +40,66 @@ jobs:
             /m `
             /verbosity:normal
 
-      - name: Upload Artifacts
+      - name: Install Coverage Tool
+        shell: pwsh
+        run: |
+          choco install OpenCppCoverage -y --no-progress
+
+      - name: Run Unit Tests with Coverage
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (-not (Test-Path $vswhere)) {
+            throw "vswhere.exe not found. Unable to locate Visual Studio Test Platform."
+          }
+
+          $vsRoot = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $vstestCandidates = @(
+            (Join-Path $vsRoot "Common7\IDE\CommonExtensions\Microsoft\TestPlatform\vstest.console.exe"),
+            (Join-Path $vsRoot "Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"),
+            (Join-Path $vsRoot "Common7\IDE\Extensions\TestPlatform\vstest.console.exe")
+          )
+          $vstest = $vstestCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          $coverageExe = "C:\Program Files\OpenCppCoverage\OpenCppCoverage.exe"
+
+          if (-not $vstest) {
+            throw "vstest.console.exe was not found in the installed Visual Studio directories."
+          }
+
+          if (-not (Test-Path $coverageExe)) {
+            throw "OpenCppCoverage.exe not found at $coverageExe"
+          }
+
+          $testAssembly = "MathLib\x64\Release\MathLibTests.dll"
+          if (-not (Test-Path $testAssembly)) {
+            throw "Test assembly not found: $testAssembly"
+          }
+
+          New-Item -ItemType Directory -Force -Path TestResults | Out-Null
+
+          & $coverageExe `
+            --sources MathLib `
+            --export_type cobertura:coverage.xml `
+            --working_dir . `
+            -- `
+            $vstest $testAssembly /Platform:x64 /Logger:"trx;LogFileName=mathlib-tests.trx" /ResultsDirectory:"TestResults"
+
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Upload Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-and-coverage
+          path: |
+            TestResults/**
+            coverage.xml
+            MathLib/x64/Release/*.dll
+          if-no-files-found: warn
+
+      - name: Upload DLL Artifact
         uses: actions/upload-artifact@v4
         with:
           name: VC-DLL
