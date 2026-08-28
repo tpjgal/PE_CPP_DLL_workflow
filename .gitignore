@@ -1,3 +1,9 @@
+# visual studio 
+*.vs
+*.vsidx
+*.suo 
+*.ipch
+
 # Prerequisites
 *.d
 
@@ -63,6 +69,8 @@ vcpkg_installed/
 
 # debug information files
 *.dwo
+# testresult 
+*.trx
 
 # test output & cache
 Testing/
